@@ -1,0 +1,10 @@
+{
+    "DATABASE": {
+        "DRIVER": "mysql",
+        "HOST": "127.0.0.1",
+        "PORT": 5432,
+        "USERNAME": "root",
+        "PASSWORD": "35m1n1n6M1T4RUM",
+        "NAME": "pacmann"
+    }
+}
