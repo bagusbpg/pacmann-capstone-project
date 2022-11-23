@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header, Depends, UploadFile, HTTPException
+from fastapi import FastAPI, UploadFile
 import shutil
 from tempfile import NamedTemporaryFile
 import time
