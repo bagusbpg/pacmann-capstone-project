@@ -37,7 +37,7 @@ async def predict(file: UploadFile | None = None):
             }
         temp.write(chunk)
     temp.close()
-    shutil.move(temp.name, f"./{time.time_ns()}.jpg")
+    shutil.move(temp.name, f'./{time.time_ns()}.jpg')
     
     return {
         'code': 200,
@@ -45,4 +45,4 @@ async def predict(file: UploadFile | None = None):
     }
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8080)
+    uvicorn.run(app, host='127.0.0.1', port=8080)

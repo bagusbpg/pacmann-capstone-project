@@ -6,5 +6,10 @@
         "USERNAME": "root",
         "PASSWORD": "35m1n1n6M1T4RUM",
         "NAME": "pacmann"
+    },
+    "APP": {
+        "HOST": "127.0.0.1",
+        "PORT": 8080,
+        "MAXIMUM_IMAGE_UPLOAD_SIZE": 2000000
     }
 }
