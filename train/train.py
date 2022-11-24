@@ -6,8 +6,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import sys
-from tensorflow.image import rot90
-from tensorflow.keras.utils import load_img, img_to_array
+# from tensorflow.image import rot90
+# from tensorflow.keras.utils import load_img, img_to_array
 
 def train_validate_test_split(imageDir):
     allImagePaths = glob(f'{imageDir}/*.jpg')
@@ -17,25 +17,21 @@ def train_validate_test_split(imageDir):
     return xTrainPath, xValidatePath, xTestPath
 
 def augment_dataset(path):
-    dataset = []
-    for imagePath in path:
+    dataset = np.ndarray(shape=(4*len(path), 224, 224, 3), dtype=np.float32)
+    for i, imagePath in enumerate(path):
         # default image
-        image = load_img(imagePath, target_size=(224, 224))
-        imageArray = img_to_array(image)
-
+        originalImage = cv2.imread(imagePath, cv2.IMREAD_COLOR)
+        image = cv2.resize(originalImage, (224,224), interpolation = cv2.INTER_AREA)
+        dataset[4*i] = image
         # image rotated 90-deg clockwise
-        imageRot90 = rot90(image, k=3)
-        imageArrayRot90 = img_to_array(imageRot90)
-
+        imageRot90 = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+        dataset[4*i+1] = imageRot90
         # image rotated 180-deg clockwise
-        imageRot180 = rot90(image, k=2)
-        imageArrayRot180 = img_to_array(imageRot180)
-
+        imageRot180 = cv2.rotate(imageRot90, cv2.ROTATE_90_CLOCKWISE)
+        dataset[4*i+2] = imageRot180
         # image rotated 270-deg clockwise
-        imageRot270 = rot90(image, k=3)
-        imageArrayRot270 = img_to_array(imageRot270)
-        
-        dataset.extend([imageArray, imageArrayRot90, imageArrayRot180, imageArrayRot270])
+        imageRot270 = cv2.rotate(imageRot180, cv2.ROTATE_90_CLOCKWISE)
+        dataset[4*i+3] = imageRot270
 
     return dataset
 
