@@ -13,6 +13,7 @@ def resize(imageDir):
             
             resizedImage = cv2.resize(image, (600,600), interpolation = cv2.INTER_AREA)
             cv2.imwrite(f'{imageDir}/{imagePath}', resizedImage)
+            processedCount += 1
     print(f'successfully resized {processedCount} images')
 
 if __name__ == '__main__':

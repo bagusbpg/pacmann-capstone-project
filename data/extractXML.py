@@ -7,6 +7,8 @@ def extractXML(imageDir):
     coordinates = {'id':[], 'xmin':[], 'xmax':[], 'ymin':[], 'ymax':[]}
     missingXMLs = []
     for imagePath in os.listdir(imageDir):
+        if not imagePath.endswith('jpg'):
+            continue
         xmlPath = f'{imageDir}/{imagePath.replace("jpg", "xml")}'
         if not os.path.exists(xmlPath):
             missingXMLs.append(xmlPath)

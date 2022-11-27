@@ -25,7 +25,7 @@ if __name__ == '__main__':
     allowedExtension = ['jfif', 'png']
     extensionBefore = sys.argv[2]
     if extensionBefore not in allowedExtension:
-        sys.exit(f'only jfif and png image extensions are supported')
+        sys.exit('only jfif and png image extensions are supported')
     print('image extension before converting to jpg:', extensionBefore)
 
     convert(imageDir)

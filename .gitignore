@@ -1,2 +1,6 @@
 data/images/
 train/model.h5
+train/__pychache__
+train/inference.csv
+train/train_log.csv
+train/test.jpg
