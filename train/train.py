@@ -6,8 +6,6 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from tensorflow.random import set_seed
-set_seed(42)
 from tensorflow.keras.applications import InceptionResNetV2
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Dense, Dropout, Flatten, Input
@@ -28,7 +26,7 @@ def augment_dataset(path, augment):
     
     for index, imagePath in enumerate(path):
         originalImage = cv2.imread(imagePath, cv2.IMREAD_COLOR)
-        image = cv2.resize(originalImage, (224,224), interpolation = cv2.INTER_AREA)
+        image = cv2.resize(originalImage, (224, 224), interpolation=cv2.INTER_AREA)
         if augment:
             # default image
             dataset[4*index] = image
@@ -101,7 +99,7 @@ def y_train_validate_test_split(xTrainPath=None, xValidatePath=None, xTestPath=N
     
     return yTrain, yValidate, yTest
 
-def preprocessing(dataset, dumped):
+def preprocessing(dataset, dumped=False):
     # zero-mean
     channel0Mean = np.mean(dataset[..., 0])
     channel1Mean = np.mean(dataset[..., 1])
@@ -129,15 +127,43 @@ def preprocessing(dataset, dumped):
 
     return dataset
 
+def preprocessing_test(dataset):
+    if not os.path.exists('./params.csv'):
+        sys.exit('params.csv is missing')
+
+    params = pd.read_csv('./params.csv', index_col='channel')
+
+    # zero-mean
+    channel0Mean = params.at[0, 'mean']
+    channel1Mean = params.at[1, 'mean']
+    channel2Mean = params.at[2, 'mean']
+    dataset[..., 0] = np.subtract(dataset[..., 0], channel0Mean)
+    dataset[..., 1] = np.subtract(dataset[..., 1], channel1Mean)
+    dataset[..., 2] = np.subtract(dataset[..., 2], channel2Mean)
+    
+    # standardization
+    channel0Std = params.at[0, 'std']
+    channel1Std = params.at[1, 'std']
+    channel2Std = params.at[2, 'std']
+    dataset[..., 0] = np.divide(dataset[..., 0], channel0Std)
+    dataset[..., 1] = np.divide(dataset[..., 1], channel1Std)
+    dataset[..., 2] = np.divide(dataset[..., 2], channel2Std)
+
+    return dataset
+
 def model_definition():
-    inception_resnet = InceptionResNetV2(weights='imagenet', include_top=False, input_tensor=Input(shape=(224,224,3)))
+    inception_resnet = InceptionResNetV2(
+        weights='imagenet', 
+        include_top=False, 
+        input_tensor=Input(shape=(224,224,3))
+    )
     headmodel = inception_resnet.output
     headmodel = Flatten()(headmodel)
     headmodel = Dense(500,activation='relu')(headmodel)
     headmodel = Dense(250,activation='relu')(headmodel)
     headmodel = Dense(4,activation='sigmoid')(headmodel)
     model = Model(inputs=inception_resnet.input, outputs=headmodel)
-    model.compile(loss='mse', optimizer=Adam(learning_rate=1e-4))
+    model.compile(loss='mse', optimizer=Adam(learning_rate=5e-5))
 
     return model
 
@@ -145,7 +171,7 @@ def fit(model, xTrain, yTrain, xValidate, yValidate):
     earlyStopping = EarlyStopping(
         monitor='val_loss',
         mode='min',
-        patience=2,
+        patience=10,
         restore_best_weights=True
     )
 
@@ -153,7 +179,7 @@ def fit(model, xTrain, yTrain, xValidate, yValidate):
         x=xTrain,
         y=yTrain,
         batch_size=10,
-        epochs=10,
+        epochs=30,
         validation_data=(xValidate,yValidate),
         callbacks=[earlyStopping]
     )
@@ -172,13 +198,13 @@ if __name__ == '__main__':
     print('length of post-augmented validation set:', len(xValidateRaw))
 
     xTrain = preprocessing(xTrainRaw, True)
-    xValidate = preprocessing(xValidateRaw, False)
+    xValidate = preprocessing_test(xValidateRaw)
     print('shape of preprocessed train set:', xTrain.shape)
     print('shape of preprocessed validation set:', xValidate.shape)
 
-    yTrain, yValidate, _ = y_train_validate_test_split(xTrainPath=xTrainPath, xValidatePath=xValidatePath, withAugmentation=True)
+    yTrain, yValidate, _ = y_train_validate_test_split(xTrainPath, xValidatePath, withAugmentation=True)
     print('shape of train target set:', yTrain.shape)
     print('shape of validation target set:', yValidate.shape)
 
-    # model = model_definition()
-    # fit(model, xTrain, yTrain, xValidate, yValidate)
+    model = model_definition()
+    fit(model, xTrain, yTrain, xValidate, yValidate)
