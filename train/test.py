@@ -9,9 +9,6 @@ import time
 from tensorflow.keras.models import load_model
 from train import x_train_validate_test_split, augment_dataset, y_train_validate_test_split, preprocessing_test
 
-def rmse(yTest, yPredict):
-    return mean_squared_error(yTest, yPredict, squared=False)
-
 def show_image(coordinate, imagePath, denormalize):
     xmin, xmax, ymin, ymax = coordinate
     print(xmin, xmax, ymin, ymax)
@@ -35,7 +32,7 @@ if __name__ == '__main__':
     xTestRaw = augment_dataset(xTestPath, False)
     print('length of post-augmented test set:', len(xTestRaw))
 
-    xTest = preprocessing_test(xTestRaw, False)
+    xTest = preprocessing_test(xTestRaw)
     print('shape of preprocessed test set:', xTest.shape)
 
     _, _, yTest = y_train_validate_test_split(xTestPath=xTestPath, withAugmentation=False)
@@ -44,8 +41,8 @@ if __name__ == '__main__':
     yPredict = model.predict(xTest)
     print('shape of test predict set:', yPredict.shape)
 
-    rmse = rmse(yTest, yPredict)
-    print('root mean square error:', rmse)
+    mse = mean_squared_error(yTest, yPredict)
+    print('mean squared error:', mse)
 
     index = [index.replace('../data/images/', '') for index in xTestPath]
     pd.DataFrame(np.multiply(yPredict, 600).astype(np.int32), columns=['xmin', 'xmax', 'ymin', 'ymax'], index=index).to_csv('inference.csv')
