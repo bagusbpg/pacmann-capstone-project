@@ -9,15 +9,15 @@ import time
 from tensorflow.keras.models import load_model
 from train import x_train_validate_test_split, augment_dataset, y_train_validate_test_split, preprocessing_test
 
-def show_image(coordinate, imagePath, denormalize):
+def show_image(coordinate, imagePath, denormalize, randomIndex):
     xmin, xmax, ymin, ymax = coordinate
     print(xmin, xmax, ymin, ymax)
     if denormalize:
         xmin, xmax, ymin, ymax = np.multiply(coordinate, 600).astype(np.int32)
     image = cv2.imread(imagePath)
     cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color=(255,0,0), thickness=3)
-    if cv2.imwrite('./test.jpg', image):
-        print('image saved as test.jpg')
+    if cv2.imwrite(f'./test-{randomIndex}.jpg', image):
+        print(f'image saved as test-{randomIndex}.jpg')
 
 if __name__ == '__main__':
     try:
@@ -49,4 +49,4 @@ if __name__ == '__main__':
 
     np.random.seed(np.int64(time.time()))
     randomIndex = np.random.randint(len(index))
-    show_image(yPredict[randomIndex], xTestPath[randomIndex], True)
+    show_image(yPredict[randomIndex], xTestPath[randomIndex], True, randomIndex)

@@ -1,4 +1,6 @@
 data/images/
+app/*.jpg
+app/*.json
 train/*.h5
 train/__pychache__
 train/*.csv
