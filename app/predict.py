@@ -1,14 +1,19 @@
 import cv2
+from easyocr import Reader
 import numpy as np
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+from keras_ocr.pipeline import Pipeline
+from keras_ocr.tools import read
 import pandas as pd
+from PIL import Image
 from pytesseract import image_to_string
 import sys
+import tempfile
 from tensorflow.keras.models import load_model
 from util import response
 
-def preprocessing_predict(imagePath=None, model=None):
+def preprocessing_predict(imagePath=None, model=None, saveROI=False):
     if not imagePath:
         return response(400, 'image file to predict is missing'), None
 
@@ -29,10 +34,10 @@ def preprocessing_predict(imagePath=None, model=None):
     except:
         return response(500, 'failed to read image file'), None
     
-    # resize to default size
+    # resize to default size, reshape, and assigning to float64 data type
     image = cv2.resize(originalImage, (224, 224), interpolation=cv2.INTER_AREA)
-    image = image.reshape(1, 224, 224, 3)
-    
+    image = image.reshape(1, 224, 224, 3).astype(np.float64)
+
     # zero-mean
     channel0Mean = params.at[0, 'mean']
     channel1Mean = params.at[1, 'mean']
@@ -53,21 +58,29 @@ def preprocessing_predict(imagePath=None, model=None):
     coordinate = model.predict(image)
     originalHeight, originalWidth, _ = originalImage.shape
     denormalizer = np.array([originalWidth, originalWidth, originalHeight, originalHeight])
-    xmin, xmax, ymin, ymax = np.multiply(coordinate, denormalizer).astype(np.int32)
+    xmin, xmax, ymin, ymax = np.multiply(coordinate, denormalizer).astype(np.int32)[0]
+    if xmax > originalWidth:
+        x = originalWidth
+    if ymax > originalHeight:
+        y = originalHeight
     regionOfInterest = originalImage[ymin:ymax, xmin:xmax]
-    try:
-        cv2.imwrite(f'{imagePath}-roi.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-    except:
-        pass
 
-    # recognize text
+    if saveROI:
+        try:
+            newImagePath = imagePath.replace('.jpg', '')
+            newImagePath = f'{newImagePath}-roi.jpg'
+            cv2.imwrite(newImagePath, regionOfInterest, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+        except:
+            pass
+        
+    # recognize text using keras_ocr
     try:
-        text = image_to_string(regionOfInterest)
+        pipeline = Pipeline()
+        finalImages = [read(image) for image in [regionOfInterest]]
+        texts = pipeline.recognize(finalImages)
+        text = '-'.join([chars[0] for chars in texts[0]])
     except:
-        text = ''
-
-    if text != '':
-        return response(400, 'no license plate found'), None
+        return response(500, 'failed to recognize text'), None
 
     return None, text
 
@@ -86,10 +99,12 @@ if __name__ == '__main__':
         sys.exit(f'{imagePath} does not exist')
     print('image path:', imagePath)
 
-    response, image, originalShape = preprocessing_predict(imagePath, model)
-    if response:
-        sys.exit(response)
+    preprocessing_predict(imagePath, model, True)
 
-    regionOfInterest = getRegionOfInterest(model, image, originalShape)
+    error, text = preprocessing_predict(imagePath, model, True)
+    if error:
+        sys.exit(error)
+
+    print(text)
 
     
