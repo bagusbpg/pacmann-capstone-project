@@ -57,7 +57,7 @@ def preprocessing_predict(imagePath=None, model=None, saveROI=False):
     # get region of interest
     coordinate = model.predict(image)
     originalHeight, originalWidth, _ = originalImage.shape
-    denormalizer = np.array([originalWidth, originalWidth, originalHeight, originalHeight])
+    denormalizer = np.array([0.9*originalWidth, 1.1*originalWidth, 0.9*originalHeight, 1.1*originalHeight])
     xmin, xmax, ymin, ymax = np.multiply(coordinate, denormalizer).astype(np.int32)[0]
     if xmax > originalWidth:
         x = originalWidth
