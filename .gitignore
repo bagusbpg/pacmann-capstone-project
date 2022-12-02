@@ -1,7 +1,7 @@
+*.json
 **.pyc
 data/images/
 app/*.jpg
-app/*.json
 train/*.h5
 train/*.csv
 train/*.jpg

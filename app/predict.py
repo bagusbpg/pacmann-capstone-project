@@ -1,13 +1,10 @@
 import cv2
-from easyocr import Reader
 import numpy as np
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from keras_ocr.pipeline import Pipeline
 from keras_ocr.tools import read
 import pandas as pd
-from PIL import Image
-from pytesseract import image_to_string
 import sys
 import tempfile
 from tensorflow.keras.models import load_model
