@@ -15,24 +15,24 @@ from util import response
 
 def preprocessing_predict(imagePath=None, model=None, saveROI=False):
     if not imagePath:
-        return response(400, 'image file to predict is missing'), None
+        return None, response(400, 'image file to predict is missing')
 
     if not model:
-        return response(400, 'model is missing'), None
+        return None, response(400, 'model is missing')
 
     paramPath = '../train/params.csv'
     if not os.path.exists(paramPath):
-        return response(500, 'params.csv is missing'), None
+        return None, response(500, 'params.csv is missing')
     
     try:
         params = pd.read_csv(paramPath, index_col='channel')
     except:
-        return response(500, 'failed to read params.csv'), None
+        return None, response(500, 'failed to read params.csv')
     
     try:
         originalImage = cv2.imread(imagePath, cv2.IMREAD_COLOR)
     except:
-        return response(500, 'failed to read image file'), None
+        return None, response(500, 'failed to read image file')
     
     # resize to default size, reshape, and assigning to float64 data type
     image = cv2.resize(originalImage, (224, 224), interpolation=cv2.INTER_AREA)
@@ -80,9 +80,9 @@ def preprocessing_predict(imagePath=None, model=None, saveROI=False):
         texts = pipeline.recognize(finalImages)
         text = '-'.join([chars[0] for chars in texts[0]])
     except:
-        return response(500, 'failed to recognize text'), None
+        return None, response(500, 'failed to recognize text')
 
-    return None, text
+    return text, None
 
 if __name__ == '__main__':
     try:
@@ -99,9 +99,7 @@ if __name__ == '__main__':
         sys.exit(f'{imagePath} does not exist')
     print('image path:', imagePath)
 
-    preprocessing_predict(imagePath, model, True)
-
-    error, text = preprocessing_predict(imagePath, model, True)
+    text, error = preprocessing_predict(imagePath, model, True)
     if error:
         sys.exit(error)
 

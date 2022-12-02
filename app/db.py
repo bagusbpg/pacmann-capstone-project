@@ -1,17 +1,63 @@
 from config import loadJSON
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from datetime.datetime import fromtimestamp
+from mysql.connector import connect
+import time
+from util import response
+import uuid
 
-config = loadJSON()
-userName = config["DATABASE"]["USERNAME"]
-password = config["DATABASE"]["PASSWORD"]
-host = config["DATABASE"]["HOST"]
-dbName = config["DATABASE"]["NAME"]
+def database_init(config):
+    if not config:
+        return None
 
-DATABASE_URL = f'mysql+mysqldb://{userName}:{password}@{host}/{dbName}'
+    db = connect(
+        host=config['DATABASE']['HOST'],
+        user=config['DATABASE']['USERNAME'],
+        password=config['DATABASE']['PASSWORD'],
+        database=config['DATABASE']['NAME']
+    )
 
-db_engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=db_engine)
+    return db
 
-Base = declarative_base()
+def check_in(db, licenseNumber):
+    query = 'INSERT INTO cars (id, license_number) VALUES (%s, %s)'
+    id = str(uuid.uuid4())
+    
+    try:
+        cursor = db.cursor()
+        cursor.execute(query, (id, licenseNumber))
+        db.commit()
+    except:
+        db.rollback()
+        return None, response(500, 'failed to check in')
+
+    return id, None
+    
+def fetch_all(db, checkedOut=False):
+    if not checkedOut:
+        query = 'SELECT id, license_number, check_in_at FROM cars WHERE check_out_at IS NULL'
+    else:
+        query = 'SELECT id, license_number, check_in_at FROM cars WHERE check_out_at NOT NULL'
+
+    try:
+        cursor = db.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+    except:
+        return None, response(500, 'failed to fetch cars')
+
+    return result, None
+
+def check_out(db, id, text):
+    now = time.time()
+    currentTimeStamp = fromtimestamp(now).strftime('%Y-%m-%d %H:%M:%S')
+    query = 'UPDATE cars SET check_out_at = %f, prediction = %s WHERE id = %s'
+
+    try:
+        cursor = db.cursor()
+        cursor.execute(query, (currentTimeStamp, text, id))
+        db.commit()
+    except:
+        db.rollback()
+        return None, response(500, 'failed to check out')
+
+    return now, None
