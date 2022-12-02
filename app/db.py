@@ -1,5 +1,5 @@
 from config import loadJSON
-from datetime.datetime import fromtimestamp
+import datetime
 from mysql.connector import connect
 import time
 from util import response
@@ -49,7 +49,7 @@ def fetch_all(db, checkedOut=False):
 
 def check_out(db, id, text):
     now = time.time()
-    currentTimeStamp = fromtimestamp(now).strftime('%Y-%m-%d %H:%M:%S')
+    currentTimeStamp = datetime.datetime.fromtimestamp(now).strftime('%Y-%m-%d %H:%M:%S')
     query = 'UPDATE cars SET check_out_at = %f, prediction = %s WHERE id = %s'
 
     try:
