@@ -5,7 +5,7 @@ First, clone this repository,
 ```bash
 git clone https://github.com/bagusbpg/pacmann-capstone-project.git
 ```
-Then, set up configuration file, plate it in root directory
+Then, set up configuration file, place it in root directory
 ```json
 {
     "DATABASE": {
@@ -29,7 +29,11 @@ It is recommended to create new python environment first and then proceed with i
 pip install -r requirements.txt
 ```
 Trained model is not included in this repository. I encourage you to work on your own model as it provides more satisfying experience, I guess. A simple training instruction is provided in train directory.
-Next, initiate your local database. An example of DDL is given in repo directory. (Sorry, we do not implement object-relational-mapping, here)
+
+
+Next, initiate your local database. An example of DDL is given in repo directory. (Sorry, we do not implement object-relational-mapping, here).
+
+
 Finally, run the application and happy experimenting!
 ```
 python ./app/api.py
