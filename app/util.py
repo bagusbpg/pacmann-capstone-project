@@ -1,5 +1,6 @@
 import numpy as np
 from tempfile import NamedTemporaryFile
+import time
 from typing import IO
 
 def prepare_image(file, limit):
