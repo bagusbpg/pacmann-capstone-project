@@ -29,7 +29,7 @@ async def root():
 
 @app.post('/checkin')
 async def check_in_new_car(file: UploadFile | None = None):
-    imagePath, error = prepare_image(file)
+    imagePath, error = prepare_image(file, LIMIT)
     if error:
         return error
     
@@ -56,7 +56,7 @@ async def check_in_new_car(file: UploadFile | None = None):
 
 @app.post('/checkout')
 async def check_out_existing_car(file: UploadFile | None = None):
-    imagePath, error = prepare_image(file)
+    imagePath, error = prepare_image(file, LIMIT)
     if error:
         return error
 

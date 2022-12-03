@@ -2,7 +2,7 @@ import numpy as np
 from tempfile import NamedTemporaryFile
 from typing import IO
 
-def prepare_image(file):
+def prepare_image(file, limit):
     if not file:
         return None, response(400, 'no image uploaded')
     
@@ -13,7 +13,7 @@ def prepare_image(file):
     temp: IO = NamedTemporaryFile(delete=False)
     for chunk in file.file:
         real_file_size += len(chunk)
-        if real_file_size > LIMIT:
+        if real_file_size > limit:
             return None, response(413, 'image size is too large')
         try:
             temp.write(chunk)
