@@ -1,4 +1,6 @@
 import numpy as np
+from tempfile import NamedTemporaryFile
+from typing import IO
 
 def prepare_image(file):
     if not file:

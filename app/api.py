@@ -4,10 +4,8 @@ from fastapi import FastAPI, UploadFile
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from predict import preprocessing_predict
-from tempfile import NamedTemporaryFile
 from tensorflow.keras.models import load_model
 import time
-from typing import IO
 from util import most_similar, prepare_image, response
 import uvicorn
 

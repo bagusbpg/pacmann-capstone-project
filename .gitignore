@@ -6,3 +6,4 @@ train/*.h5
 train/*.csv
 train/*.jpg
 capstone.pem
+.vscode
