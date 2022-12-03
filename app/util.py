@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from tempfile import NamedTemporaryFile
 import time
 from typing import IO
