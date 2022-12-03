@@ -1,4 +1,5 @@
 from config import loadJSON
+import datetime
 from db import database_init, check_in, fetch_all, check_out
 from fastapi import FastAPI, UploadFile
 import os
@@ -77,10 +78,11 @@ async def check_out_existing_car(file: UploadFile | None = None):
         return error
     
     checkOutTime, error = check_out(db, existingId, text)
+    dateTime = datetime.datetime.fromtimestamp(checkOutTime).strftime('%c')
     if error:
         return error
 
-    return response(200, f'licence plate {text} checked in at {checkOutTime}')
+    return response(200, f'licence plate {text} checked out at {dateTime}')
 
 if __name__ == '__main__':
     uvicorn.run(app, host=HOST, port=PORT)
