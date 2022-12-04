@@ -151,3 +151,9 @@ it will throw following response
     "message": "service works fine!"
 }
 ```
+# Some insights and further development
+- My image dataset is of Indonesian cars. What I have observed is that optical character recognition often failed to tell capital O and Q apart. Some other characters suffer from the same problem as well, particularly capital I is often mistook as lowercase l or number 1. Perhaps, Indonesian police department may reconsider of dropping those similar character for their car license number. If not (and most likely they will not), specially trained optical character recognition is needed to tackle this problem.
+- Currently, endpoints are developed to satisfy minimum viable product. But of course, it will be a lot nicer to have full CRUD endpoints.
+- An integration with proper user interface via frontend application would certainly boost user experience. A secured HTTP is also important to protect communication between client and server.
+# Reference
+[Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning](https://arxiv.org/pdf/1602.07261)
