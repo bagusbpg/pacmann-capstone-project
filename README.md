@@ -68,7 +68,7 @@ python ./data/extractXML.py ./data/images
 ```bash
 python ./train/train.py
 ```
-- In general, what it does are (1) splitting training, validation, and test for feature-dataset, (2) resize to (224, 224) image shape and augment, i.e. rotating each image 90-degrees, 180-degrees, and 270-degrees clockwise to artificially make dataset four times bigger, (3) preprocessing each image, i.e. channel-wise standardization to make zero mean and unit standard deviation of dataset, (4) save mean and standard deviation of training dataset to be used for inference, (5) splitting training, validation, and test for target-dataset, which comes from extracted Pascal VOC XMLs described earlier, (6) define model, and finallny (7) fit the model and save it. Model fitting is equipped with EarlyStopping to prevent overfitting. Following is the plot of metrics (mean squared error) during model training. You may plot your own from automatically-generated train_log.csv.
+- In general, what it does are (1) splitting training, validation, and test for feature-dataset, (2) resize to (224, 224) image shape and augment, i.e. rotating each image 90-degrees, 180-degrees, and 270-degrees clockwise to artificially make dataset four times bigger, (3) preprocessing each image, i.e. channel-wise standardization to make zero mean and unit standard deviation of dataset, (4) save mean and standard deviation of training dataset to be used for inference, (5) splitting training, validation, and test for target-dataset, which comes from extracted Pascal VOC XMLs described earlier, (6) define model, and finally (7) fit the model and save it. Model fitting is equipped with EarlyStopping to prevent overfitting. Following is the plot of metrics (mean squared error) during model training. You may plot your own from automatically-generated train_log.csv.
 <p align="center"><img src="asset/train-metrics.png" width="500"></p>
 
 # Sample training dataset
@@ -132,7 +132,7 @@ An example request using `curl` command is given below.
 ```bash
 curl --location --request POST '<HOST>:<PORT>/checkout' --form 'file=@<PATH-TO-JPG-FILE>'
 ```
-And corresponding response, if successfull, may looks like this.
+And corresponding response, if successfull, may look like this.
 ```json
 {
     "code": 200,
