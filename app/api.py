@@ -1,24 +1,18 @@
-from config import loadJSON
+from config import load_JSON, load_my_model
 import datetime
 from db import database_init, check_in, fetch_all, check_out
 from fastapi import FastAPI, UploadFile
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from predict import preprocessing_predict
-from tensorflow.keras.models import load_model
 from util import most_similar, prepare_image, response
 import uvicorn
 
-try:
-    model = load_model('../train/model.h5', compile=False)
-    config = loadJSON()
-    HOST = config['APP']['HOST']
-    PORT = config['APP']['PORT']
-    LIMIT = config['APP']['MAXIMUM_IMAGE_UPLOAD_SIZE']
-    THRESHOLD = config['APP']['THRESHOLD_OF_SIMILARITY']
-except:
-    model = None
-    config = None
+model = load_my_model('/app/train/model.h5')
+config = load_JSON('/app/config.json')
+HOST = config['APP']['HOST']
+PORT = config['APP']['PORT']
+LIMIT = config['APP']['MAXIMUM_IMAGE_UPLOAD_SIZE']
+THRESHOLD = config['APP']['THRESHOLD_OF_SIMILARITY']
 
 app = FastAPI()
 db = database_init(config)

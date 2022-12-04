@@ -1,4 +1,9 @@
 Dockerfile
+app/*.jpg
+asset
+data/images
 repo
+train/*.jpg
+capstone.pem
 README.md
-train/HOW_TO.md
+.vscode

@@ -1,4 +1,4 @@
-from config import loadJSON
+from config import load_JSON
 import datetime
 from mysql.connector import connect
 import time

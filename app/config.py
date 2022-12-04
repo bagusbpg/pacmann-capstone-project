@@ -1,14 +1,35 @@
 import json
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import sys
+from tensorflow.keras.models import load_model
 
-def loadJSON():
-    with open('../config.json', 'r') as f:
-        config = json.load(f)
-    
-    return config
+def load_my_model(path='../train/model.h5'):
+    if not os.path.exists(path):
+        path = '../train/model.h5'
+
+    try:
+        model = load_model(path, compile=False)
+
+        return model
+    except:
+        return None
+
+
+def load_JSON(path='../config.json'):
+    if not os.path.exists(path):
+        path = '../config.json'
+
+    try:
+        with open(path, 'r') as f:
+            config = json.load(f)
+        
+        return config
+    except:
+        return None
 
 if __name__ == '__main__':
-    config = loadJSON()
+    config = load_JSON()
     if len(sys.argv) == 1:
         print(config)
     elif len(sys.argv) == 2:
