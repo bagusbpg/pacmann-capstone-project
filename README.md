@@ -71,8 +71,7 @@ Currently, two main endpoints are provided with one auxiliary endpoint is for he
 ## /checkin
 This path only accepts `POST` requests. Requests should be `form-data` with a key `file` and value containing `image/jpeg` file. User may upload image of car to this endpoint. An example request using `curl` command is given below.
 ```bash
-curl --location --request POST '<HOST>:<PORT>/checkin' 
---form 'file=@<PATH-TO-JPG-FILE>'
+curl --location --request POST '<HOST>:<PORT>/checkin' --form 'file=@<PATH-TO-JPG-FILE>'
 ```
 Response uses standard format as in the following example.
 ```json
@@ -85,8 +84,7 @@ In general, this endpoint attempts to recognize the available license plate on u
 ## /checkout
 This path expects request and gives response much like `/checkin`, but instead of "checking in" a car, it does the opposite. An example request using `curl` command is given below.
 ```bash
-curl --location --request POST '<HOST>:<PORT>/checkout' 
---form 'file=@<PATH-TO-JPG-FILE>'
+curl --location --request POST '<HOST>:<PORT>/checkout' --form 'file=@<PATH-TO-JPG-FILE>'
 ```
 And corresponding response, if successfull, may looks like this.
 ```json
