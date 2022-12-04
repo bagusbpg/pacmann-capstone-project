@@ -78,7 +78,7 @@ Response uses standard format as in the following example.
 ```json
 {
     "code": 200,
-    "message": "licence plate B-2467-UXY checked in with id 6454887f-1869-46e4-a92a-5c927f1938be"
+    "message": "licence plate ac-1616-fk-06126 checked in with id 6454887f-1869-46e4-a92a-5c927f1938be"
 }
 ```
 In general, this endpoint attempts to recognize the available license plate on uploaded image, then stored it in database, effectively "checking in" a car.
