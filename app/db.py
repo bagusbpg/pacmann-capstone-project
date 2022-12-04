@@ -9,12 +9,15 @@ def database_init(config):
     if not config:
         return None
 
-    db = connect(
-        host=config['DATABASE']['HOST'],
-        user=config['DATABASE']['USERNAME'],
-        password=config['DATABASE']['PASSWORD'],
-        database=config['DATABASE']['NAME']
-    )
+    try:
+        db = connect(
+            host=config['DATABASE']['HOST'],
+            user=config['DATABASE']['USERNAME'],
+            password=config['DATABASE']['PASSWORD'],
+            database=config['DATABASE']['NAME']
+        )
+    except:
+        db = None
 
     return db
 

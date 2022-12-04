@@ -60,10 +60,12 @@ python ./data/extractXML.py ./data/images
 ```bash
 python ./train/train.py
 ```
-- In general, what it does are (1) splitting training, validation, and test for feature-dataset, (2) augment images, i.e. rotating each image 90-degrees, 180-degrees, and 270-degrees clockwise to artificially make dataset four times bigger, (3) preprocessing each image, i.e. channel-wise standardization to make zero mean and unit standard deviation of dataset, (4) save mean and standard deviation of training dataset to be used for inference, (5) splitting training, validation, and test for target-dataset, which comes from extracted Pascal VOC XMLs described earlier, (6) define model, and finallny (7) fit the model and save it. Model fitting is equipped with EarlyStopping to prevent overfitting.
+- In general, what it does are (1) splitting training, validation, and test for feature-dataset, (2) resize to (224, 224) image shape and augment, i.e. rotating each image 90-degrees, 180-degrees, and 270-degrees clockwise to artificially make dataset four times bigger, (3) preprocessing each image, i.e. channel-wise standardization to make zero mean and unit standard deviation of dataset, (4) save mean and standard deviation of training dataset to be used for inference, (5) splitting training, validation, and test for target-dataset, which comes from extracted Pascal VOC XMLs described earlier, (6) define model, and finallny (7) fit the model and save it. Model fitting is equipped with EarlyStopping to prevent overfitting. Following is the plot of metrics (mean squared error) during model training. You may plot your own from automatically-generated train_log.csv.
+![training metrics](asset/train-metrics.png)
 # How prediction works
-
-
+![prediction diagram](asset/prediction-diagram.jpg)
+- Trained model is used to predict the location of license plate on car image received via API. In general, the original image is pre-processed similarly to training dataset: (1) it is resized to standard (224x224) shape, (2) standardization using training params (channel-wise mean and standard deviation), (3) predict location of licens plate, (4) extend window of predicted location to account for inaccuracy, (5) crop original image to get Region of Interest, (6) read text embbeded in Region of Interest with the help of keras-ocr.
+- In case of using /checkout endpoint, it is necessary to compare the resulting text with those stored in database. Comparison is done using character-based text similarity calculation algorithm with certain threshold. 
 # Documentation
 Currently, two main endpoints are provided with one endpoint is for health-check.
 ## /checkin
