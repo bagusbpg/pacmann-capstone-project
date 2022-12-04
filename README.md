@@ -1,5 +1,10 @@
 # About the project
-This application provides REST API for car license number recognition. Sample implementations may include car parking billing system or likewise.
+<p align="center"><img src="asset/test.jpg" width="500"></p>
+<p align="center"><img src="asset/test-roi.jpg" width="200"></p>
+This application provides REST API for car license number recognition. Sample implementations may include car parking billing system or likewise. In general, this application intends to automatize job/proces of recognizing car license number, in which currently human involvement is arguably high. With such automatization, it may reduce fault due to human-error, improve service in terms of accuracy and time of completion which eventually bring better user experience, and the last, bot not least, to effectively reduce cost.
+## Architecture
+![architecture](asset/architecture.jpg)
+Application is built in python. It also communicates with MySQL database to store prediction results. Both python application and MySQL are dockerized and deployed using Amazon Web Service EC2 instance. A github-action based workflow is set up for continuous integration/continuous development. And the deployed service is then serving clients using standard HTTP. Note: secured HTTP communication is currently not supported, but I hope it will be featured in future development.
 # Installation
 First, clone this repository,
 ```bash
@@ -48,7 +53,8 @@ docker build -t app .
 docker run -d -p <host-port>:<container-port> --name <container-name> <image-name>
 ```
 # How to train a model
-![training diagram](asset/train-diagram.jpg)
+<p align="center"><img src="asset/train-diagram.jpg" width="500"></p>
+
 ## Training data preparation
 - Collect images of cars with license plate for training purpose and place it under /data/images directory. It is better to have images of various brightness, orientation, perspective, scale, sharpness, etc. If you are interested, you may email me at bagusbpg[at]gmail[dot]com and I will share the dataset for training (uploading these huge image dataset to repository is consuming too much space)
 - Create `PASCAL Visual Object Classes Challenge` for each image, identifying the location of license plate. In case `PASCAL VOC` is created in XML, you may run extractXML.py in data directory to extract `xmin`, `xmax`, `ymin`, and `ymax` coordinates and save them to csv file for later use in training model. Required argument to run this script is path to directory containing images and XML files. <p>NOTE: Beside XML, JSON is also valid format to store `PASCAL VOC`, you may create your own script to do the same thing as extractXML.py.
@@ -61,15 +67,16 @@ python ./data/extractXML.py ./data/images
 python ./train/train.py
 ```
 - In general, what it does are (1) splitting training, validation, and test for feature-dataset, (2) resize to (224, 224) image shape and augment, i.e. rotating each image 90-degrees, 180-degrees, and 270-degrees clockwise to artificially make dataset four times bigger, (3) preprocessing each image, i.e. channel-wise standardization to make zero mean and unit standard deviation of dataset, (4) save mean and standard deviation of training dataset to be used for inference, (5) splitting training, validation, and test for target-dataset, which comes from extracted Pascal VOC XMLs described earlier, (6) define model, and finallny (7) fit the model and save it. Model fitting is equipped with EarlyStopping to prevent overfitting. Following is the plot of metrics (mean squared error) during model training. You may plot your own from automatically-generated train_log.csv.
-![training metrics](asset/train-metrics.png)
+<p align="center"><img src="asset/train-metrics.png" width="500"></p>
+
 # How prediction works
-![prediction diagram](asset/prediction-diagram.jpg)
+<p align="center"><img src="asset/prediction-diagram.jpg" width="500"></p>
 - Trained model is used to predict the location of license plate on car image received via API. In general, the original image is pre-processed similarly to training dataset: (1) it is resized to standard (224x224) shape, (2) standardization using training params (channel-wise mean and standard deviation), (3) predict location of license plate, (4) extend window of predicted location to account for inaccuracy, (5) crop original image to get Region of Interest, (6) read text embbeded in Region of Interest with the help of keras-ocr.
-- In case of using /checkout endpoint, it is necessary to compare the resulting text with those stored in database. Comparison is done using character-based text similarity calculation algorithm with certain threshold. 
+- In case of using /checkout endpoint, it is necessary to compare the resulting text with those stored in database. Comparison is done using character-based text similarity calculation algorithm with certain threshold. Further explanation can be read under Documentation section of /checkout endpoint.
 # Documentation
 Currently, two main endpoints are provided with one auxiliary endpoint is for health-check.
 ## /checkin
-This path only accepts `POST` requests. Requests should be `form-data` with a key `file` and value containing `image/jpeg` file. User may upload image of car to this endpoint. An example request using `curl` command is given below.
+This path only accepts `POST` requests. Requests should be `form-data` with a key `file` and value containing `image/jpeg` file. User may upload image of car to this endpoint. Any attempt to upload other kind of file or image format may result in client error. An upper limit for image file size is also set, preventing user to abuse the service. An example request using `curl` command is given below.
 ```bash
 curl --location --request POST '<HOST>:<PORT>/checkin' --form 'file=@<PATH-TO-JPG-FILE>'
 ```
@@ -82,7 +89,9 @@ Response uses standard format as in the following example.
 ```
 In general, this endpoint attempts to recognize the available license plate on uploaded image, then stored it in database, effectively "checking in" a car.
 ## /checkout
-This path expects request and gives response much like `/checkin`, but instead of "checking in" a car, it does the opposite. An example request using `curl` command is given below.
+This path expects request and gives response much like `/checkin`, with the same request validation (file type and size). But instead of "checking in" a car, it does the opposite. It tries to match the parsed car license number with those exist in database. Pattern matching allows for unexact match, meaning that it uses character-based text-similarity-calculation algorithm to determine if two text are similar or not based on certain threshold. But, do not worry as it searches for the best match.
+
+An example request using `curl` command is given below.
 ```bash
 curl --location --request POST '<HOST>:<PORT>/checkout' --form 'file=@<PATH-TO-JPG-FILE>'
 ```
